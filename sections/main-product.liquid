@@ -1,224 +1,422 @@
 {% schema %}
 {
-  "name": "Product Information",
-  "settings": []
+  "name": "Product Page",
+  "settings": [],
+  "blocks": [
+    {
+      "type": "@app"
+    },
+    {
+      "type": "specification_item",
+      "name": "Manual Specification",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Label",
+          "default": "Material"
+        },
+        {
+          "type": "text",
+          "id": "content",
+          "label": "Value",
+          "default": "Connect dynamic source here"
+        }
+      ]
+    }
+  ]
 }
 {% endschema %}
 
 {% assign selected_variant = product.selected_or_first_available_variant %}
+{% assign current_media = selected_variant.featured_media | default: product.featured_media %}
 
-<div class="animate-fade-in max-w-7xl mx-auto px-4 py-12" id="MainProductSection" data-section-id="{{ section.id }}">
+<div class="animate-fade-in" id="MainProductSection" data-section-id="{{ section.id }}">
     
-    <div class="flex items-center space-x-2 text-sm font-medium text-gray-400 mb-8 flex-wrap">
-        <a href="/" class="hover:text-sky-500 transition-colors">Home</a>
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-        <a href="/collections/all" class="hover:text-sky-500 transition-colors">Shop</a>
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-        <span class="text-slate-800">{{ product.title }}</span>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-16 mb-24">
-        
-        <div class="product-gallery">
-            <div 
-                class="relative aspect-square bg-white rounded-3xl overflow-hidden cursor-crosshair mb-6 group border border-gray-100 shadow-sm main-image-container"
-                onmousemove="handleZoom(event)"
-                onmouseleave="resetZoom(event)"
-            >
-                <img 
-                    id="MainImage"
-                    src="{{ main_image_url }}" 
-                    alt="{{ product.title | escape }}" 
-                    class="w-full h-full object-cover pointer-events-none"
-                    width="1000"
-                    height="1000"
-                >
-                <div 
-                    id="ZoomLens"
-                    class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                    style="background-image: url('{{ selected_variant.featured_image | default: product.featured_image | image_url: width: 2000 }}'); background-repeat: no-repeat; background-size: 200%;"
-                ></div>
-            </div>
-
-            <div class="grid grid-cols-4 gap-4">
-                {% for media in product.media %}
-                    <div 
-                        class="aspect-square rounded-2xl overflow-hidden border-2 cursor-pointer transition-all {% if forloop.first %}border-sky-500 ring-2 ring-sky-100{% else %}border-transparent hover:border-sky-200{% endif %}"
-                        onclick="changeImage('{{ media | image_url: width: 1000 }}', '{{ media | image_url: width: 2000 }}', this)"
-                    >
-                        <img 
-                            src="{{ small_thumb }}" 
-                            class="w-full h-full object-cover"
-                            width="200"
-                            height="200"
-                            alt="{{ media.alt | escape | default: product.title }}"
-                        >
-                    </div>
-                {% endfor %}
-            </div>
+    <div class="max-w-7xl mx-auto px-4 py-12">
+        <div class="flex items-center space-x-2 text-sm font-medium text-gray-400 mb-8 flex-wrap">
+            <a href="{{ routes.root_url }}" class="hover:text-black transition-colors">Home</a>
+            <span>/</span>
+            <a href="{{ routes.all_products_collection_url }}" class="hover:text-black transition-colors">Shop</a>
+            <span>/</span>
+            <span class="text-slate-800">{{ product.title }}</span>
         </div>
 
-        <div class="flex flex-col justify-center">
-            <div class="inline-block bg-sky-50 text-sky-600 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide mb-4 w-fit">
-                {{ product.type }}
-            </div>
-            <h1 class="text-4xl md:text-5xl font-bold text-slate-900 mb-4 tracking-tight leading-tight">
-                {{ product.title }}
-            </h1>
-            <div class="text-3xl text-slate-900 font-bold mb-8" id="ProductPrice">
-                {{ selected_variant.price | money }}
-            </div>
-            <div class="text-gray-500 leading-relaxed mb-10 text-lg">
-                {{ product.description }}
-            </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-16 mb-24">
+            
+            <div class="product-gallery sticky top-24 self-start">
+                <div 
+                    class="relative aspect-square bg-white rounded-2xl overflow-hidden mb-4 border border-gray-100 shadow-sm group cursor-crosshair"
+                    id="MainImageWrapper"
+                    onmousemove="handleZoom(event)"
+                    onmouseleave="resetZoom(event)"
+                >
+                    {% if current_media != null %}
+                        <img 
+                            id="MainImage"
+                            src="{{ current_media | image_url: width: 1000 }}" 
+                            alt="{{ product.title | escape }}" 
+                            class="w-full h-full object-contain pointer-events-none transition-transform duration-200" 
+                            width="1000"
+                            height="1000"
+                        >
+                        <div 
+                            id="ZoomLens"
+                            class="absolute inset-0 opacity-0 group-hover:opacity-100 pointer-events-none bg-no-repeat bg-white"
+                            style="background-image: url('{{ current_media | image_url: width: 2000 }}'); background-size: 200%; z-index: 10;"
+                        ></div>
+                    {% else %}
+                        {{ 'product-1' | placeholder_svg_tag: 'w-full h-full object-cover text-gray-200' }}
+                    {% endif %}
+                </div>
 
-            {% form 'product', product %}
-                <input type="hidden" name="id" value="{{ selected_variant.id }}" id="VariantIdInput">
-
-                <div class="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm mb-8 space-y-6">
-                    
-                    {% unless product.has_only_default_variant %}
-                        {% for option in product.options_with_values %}
-                            <div>
-                                <label class="block text-sm font-bold text-slate-900 mb-3">{{ option.name }}</label>
-                                <div class="flex flex-wrap gap-3">
-                                    {% for value in option.values %}
-                                        <div class="relative">
-                                            <input 
-                                                type="radio" 
-                                                id="Option-{{ section.id }}-{{ forloop.parentloop.index0 }}-{{ forloop.index0 }}"
-                                                name="options[{{ option.name }}]"
-                                                value="{{ value | escape }}"
-                                                class="peer sr-only variant-radio"
-                                                {% if option.selected_value == value %}checked{% endif %}
-                                                data-option-index="{{ forloop.parentloop.index0 }}"
-                                            >
-                                            <label 
-                                                for="Option-{{ section.id }}-{{ forloop.parentloop.index0 }}-{{ forloop.index0 }}"
-                                                class="block px-4 py-2 rounded-xl text-sm font-medium transition-all bg-gray-50 text-gray-500 hover:bg-gray-100 peer-checked:bg-slate-900 peer-checked:text-white peer-checked:shadow-md cursor-pointer"
-                                            >
-                                                {{YZ954value }}
-                                            </label>
-                                        </div>
-                                    {% endfor %}
-                                </div>
+                {% if product.media.size > 1 %}
+                    <div class="grid grid-cols-4 gap-3" id="ThumbnailGrid">
+                        {% for media in product.media limit: 8 %}
+                            <div 
+                                class="aspect-square rounded-xl overflow-hidden border cursor-pointer transition-all thumbnail-item relative
+                                {% if media.id == current_media.id %} ring-2 ring-black border-transparent {% else %} border-gray-200 hover:border-gray-400 {% endif %}"
+                                data-media-id="{{ media.id }}"
+                                onclick="changeImage('{{ media | image_url: width: 1000 }}', '{{ media | image_url: width: 2000 }}', this)"
+                            >
+                                <img 
+                                    src="{{ media | image_url: width: 200 }}" 
+                                    alt="{{ media.alt | escape }}"
+                                    class="w-full h-full object-cover"
+                                    width="200"
+                                    height="200"
+                                >
                             </div>
                         {% endfor %}
-                    {% endunless %}
+                    </div>
+                {% endif %}
+            </div>
 
-                    <div>
-                        <label class="block text-sm font-bold text-slate-900 mb-3">Quantity</label>
-                        <div class="flex items-center w-36 bg-gray-50 rounded-full p-1 border border-gray-100" x-data="{ qty: 1 }">
-                            <button type="button" @click="qty = Math.max(1, qty - 1)" class="w-10 h-10 rounded-full bg-white text-slate-900 shadow-sm flex items-center justify-center hover:text-sky-500 transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>
-                            </button>
-                            <input type="number" name="quantity" x-model="qty" class="w-full text-center font-bold text-slate-900 bg-transparent outline-none appearance-none m-0" min="1">
-                            <button type="button" @click="qty++" class="w-10 h-10 rounded-full bg-white text-slate-900 shadow-sm flex items-center justify-center hover:text-sky-500 transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-                            </button>
+            <div class="flex flex-col">
+                <div class="inline-block bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide mb-3 w-fit">
+                    {{ product.type }}
+                </div>
+
+                <h1 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4 tracking-tight leading-tight">
+                    {{ product.title }}
+                </h1>
+                
+                <div class="text-2xl text-slate-900 font-bold mb-6" id="ProductPrice">
+                    {{ selected_variant.price | money }}
+                    {% if selected_variant.compare_at_price > selected_variant.price %}
+                        <span class="text-gray-400 line-through text-lg ml-2">{{ selected_variant.compare_at_price | money }}</span>
+                    {% endif %}
+                </div>
+
+                {% form 'product', product, id: 'product-form' %}
+                    <input type="hidden" name="id" value="{{ selected_variant.id }}" id="VariantIdInput">
+
+                    <div class="mb-8 space-y-6">
+                        {% unless product.has_only_default_variant %}
+                            {% for option in product.options_with_values %}
+                                <div class="variant-option-group">
+                                    <label class="block text-sm font-bold text-slate-900 mb-3">{{ option.name }}</label>
+                                    <div class="flex flex-wrap gap-2">
+                                        {% for value in option.values %}
+                                            <div class="relative">
+                                                <input 
+                                                    type="radio" 
+                                                    id="Option-{{ section.id }}-{{ forloop.parentloop.index0 }}-{{ forloop.index0 }}"
+                                                    name="options[{{ option.name }}]"
+                                                    value="{{ value | escape }}"
+                                                    class="sr-only variant-radio"
+                                                    {% if option.selected_value == value %}checked{% endif %}
+                                                    data-option-index="{{ forloop.parentloop.index0 }}"
+                                                >
+                                                <label 
+                                                    for="Option-{{ section.id }}-{{ forloop.parentloop.index0 }}-{{ forloop.index0 }}"
+                                                    class="variant-label block px-5 py-2.5 rounded-lg text-sm font-semibold cursor-pointer border transition-all bg-white text-slate-700 border-gray-200 hover:border-gray-400"
+                                                >
+                                                    {{ value }}
+                                                </label>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% endunless %}
+
+                        <div>
+                            <label class="block text-sm font-bold text-slate-900 mb-3">Quantity</label>
+                            <div class="flex items-center w-32 border border-gray-300 rounded-lg overflow-hidden" x-data="{ qty: 1 }">
+                                <button type="button" @click="qty = Math.max(1, qty - 1)" class="w-10 h-10 bg-gray-50 hover:bg-gray-100 flex items-center justify-center border-r border-gray-300 transition-colors">-</button>
+                                <input type="number" name="quantity" x-model="qty" class="w-full text-center font-bold text-slate-900 bg-white outline-none appearance-none m-0 border-none h-10" min="1" value="1">
+                                <button type="button" @click="qty++" class="w-10 h-10 bg-gray-50 hover:bg-gray-100 flex items-center justify-center border-l border-gray-300 transition-colors">+</button>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="flex gap-4 mb-10">
-                    <button 
-                        type="submit" 
-                        name="add" 
-                        class="flex-1 text-lg py-4 font-medium transition-all duration-300 rounded-full bg-sky-500 text-white hover:bg-sky-400 hover:shadow-lg hover:shadow-sky-200 shadow-xl"
-                        {% unless selected_variant.available %}disabled{% endunless %}
-                    >
-                        {% if selected_variant.available %}Add to Cart{% else %}Sold Out{% endif %}
-                    </button>
-                </div>
-            {% endform %}
+                    <div class="flex gap-4 mb-10 w-full">
+                        <button 
+                            type="submit" 
+                            name="add" 
+                            class="flex-1 py-3.5 px-6 font-bold text-sm uppercase tracking-wide transition-all duration-300 rounded-lg border-2 border-slate-900 bg-transparent text-slate-900 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                            {% unless selected_variant.available %}disabled{% endunless %}
+                        >
+                            {% if selected_variant.available %}Add to Cart{% else %}Sold Out{% endif %}
+                        </button>
 
-            <div class="border-t border-gray-100 pt-8">
-                <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wide mb-6">Specifications</h3>
-                <div class="grid grid-cols-2 gap-y-4 gap-x-8">
-                    <div class="space-y-1">
-                        <div class="text-gray-400 text-xs uppercase font-bold">Vendor</div>
-                        <div class="text-slate-900 font-medium">{{ product.vendor }}</div>
+                        <button 
+                            type="button" 
+                            onclick="buyNow()"
+                            class="flex-1 py-3.5 px-6 font-bold text-sm uppercase tracking-wide transition-all duration-300 rounded-lg bg-slate-900 text-white hover:bg-slate-800 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            {% unless selected_variant.available %}disabled{% endunless %}
+                        >
+                            <span>Buy Now</span>
+                        </button>
                     </div>
-                    <div class="space-y-1">
-                        <div class="text-gray-400 text-xs uppercase font-bold">SKU</div>
-                        <div class="text-slate-900 font-medium">{{ selected_variant.sku }}</div>
+                {% endform %}
+
+                <div class="border-t border-gray-200 pt-8">
+                    <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wide mb-6">Product Specifications</h3>
+                    
+                    <div class="grid grid-cols-1 gap-y-4 text-sm">
+                        <div class="grid grid-cols-3 border-b border-gray-100 pb-2">
+                            <span class="text-gray-500 font-medium">Vendor</span>
+                            <span class="col-span-2 text-slate-900 font-medium">{{ product.vendor }}</span>
+                        </div>
+                        <div class="grid grid-cols-3 border-b border-gray-100 pb-2">
+                            <span class="text-gray-500 font-medium">SKU</span>
+                            <span class="col-span-2 text-slate-900 font-medium" id="SkuDisplay">{{ selected_variant.sku | default: 'N/A' }}</span>
+                        </div>
+
+                        {% for attribute in product.metafields.shopify %}
+                            {% assign key = attribute.first %}
+                            {% assign value = attribute.last %}
+                            
+                            {% unless key contains 'discovery' or key contains 'search' or key == 'trace_id' %}
+                                {% if value != blank %}
+                                    <div class="grid grid-cols-3 border-b border-gray-100 pb-2">
+                                        <span class="text-gray-500 font-medium capitalize flex items-center">
+                                            {{ key | replace: '-', ' ' | replace: '_', ' ' }}
+                                        </span>
+                                        
+                                        <span class="col-span-2 text-slate-900 font-medium">
+                                            {% if value.type contains 'list' %}
+                                                <div class="flex flex-wrap gap-2">
+                                                    {% for item in value.value %}
+                                                        <span class="inline-block bg-gray-100 text-slate-700 px-2 py-0.5 rounded text-xs border border-gray-200">
+                                                            {{ item }}
+                                                        </span>
+                                                    {% endfor %}
+                                                </div>
+                                            {% else %}
+                                                {{ value.value }}
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                {% endif %}
+                            {% endunless %}
+                        {% endfor %}
+
+                        {% for metafield in product.metafields.custom %}
+                            {% assign field_key = metafield | first %}
+                            {% assign field_value = metafield | last %}
+                            
+                            {% if field_value != blank %}
+                                <div class="grid grid-cols-3 border-b border-gray-100 pb-2">
+                                    <span class="text-gray-500 font-medium capitalize">{{ field_key | replace: '_', ' ' }}</span>
+                                    <span class="col-span-2 text-slate-900 font-medium">
+                                        {{ field_value | metafield_tag }}
+                                    </span>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% for block in section.blocks %}
+                            {% if block.type == 'specification_item' and block.settings.content != blank and block.settings.content != 'Connect dynamic source here' %}
+                                <div class="grid grid-cols-3 border-b border-gray-100 pb-2" {{ block.shopify_attributes }}>
+                                    <span class="text-gray-500 font-medium">{{ block.settings.heading }}</span>
+                                    <span class="col-span-2 text-slate-900 font-medium">
+                                        {{ block.settings.content }}
+                                    </span>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
                     </div>
                 </div>
+                
+                {% for block in section.blocks %}
+                    {% if block.type == '@app' %}
+                        <div class="mt-8">{% render block %}</div>
+                    {% endif %}
+                {% endfor %}
+
             </div>
         </div>
     </div>
+
+    <div class="w-full bg-gray-50 border-t border-gray-200">
+        <div class="max-w-4xl mx-auto px-4 py-16">
+            <h2 class="text-2xl font-bold text-slate-900 mb-8 text-center">Description</h2>
+            <div class="product-description prose prose-slate mx-auto max-w-none">
+                {{ product.description }}
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* 强制选中样式 */
+        .selected-variant {
+            background-color: #0f172a !important; /* slate-900 */
+            color: #ffffff !important;
+            border-color: #0f172a !important;
+        }
+
+        input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        .product-description img { max-width: 100%; height: auto; margin: 1.5rem auto; display: block; border-radius: 8px; }
+        .product-description iframe { width: 100%; aspect-ratio: 16/9; border-radius: 8px; margin: 2rem 0; }
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
+        
+        .metafield-list { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .metafield-list-item { display: inline-block; background: #f3f4f6; padding: 0.1rem 0.6rem; border-radius: 4px; font-size: 0.9em; }
+    </style>
+
 </div>
 
 <script>
     var product = {{ product | json }};
-</script>
+    window.Shopify = window.Shopify || {};
+    window.Shopify.money_format = '{{ shop.money_format | escape }}';
 
-<script>
-    // 1. 放大镜逻辑
-    function handleZoom(e) {
-        const container = e.currentTarget;
-        const lens = container.querySelector('#ZoomLens');
-        const rect = container.getBoundingClientRect();
-        
-        const x = ((e.clientX - rect.left) / rect.width) * 100;
-        const y = ((e.clientY - rect.top) / rect.height) * 100;
-        
-        lens.style.backgroundPosition = `${x}% ${y}%`;
+    function initVariantState() {
+        document.querySelectorAll('.variant-radio').forEach(radio => {
+            if(radio.checked) updateVariantStyle(radio);
+        });
     }
 
-    function resetZoom(e) {
-        // CSS hover 处理了 opacity，这里可以留空或者做额外清理
+    function updateVariantStyle(activeRadio) {
+        const groupName = activeRadio.name;
+        const groupRadios = document.querySelectorAll(`input[name="${groupName}"]`);
+        groupRadios.forEach(r => {
+            const label = document.querySelector(`label[for="${r.id}"]`);
+            if(label) label.classList.remove('selected-variant');
+        });
+        const activeLabel = document.querySelector(`label[for="${activeRadio.id}"]`);
+        if(activeLabel) activeLabel.classList.add('selected-variant');
     }
 
-    // 2. 图片切换逻辑
-    function changeImage(src, zoomSrc, thumbEl) {
-        document.getElementById('MainImage').src = src;
-        document.getElementById('ZoomLens').style.backgroundImage = `url('${zoomSrc}')`;
-        
-        // 更新缩略jh边框样式
-        const thumbs = thumbEl.parentElement.children;
-        for (let t of thumbs) {
-            t.classList.remove('border-sky-500', 'ring-2', 'ring-sky-100');
-            t.classList.add('border-transparent');
-        }
-        thumbEl.classList.remove('border-transparent');
-        thumbEl.classList.add('border-sky-500', 'ring-2', 'ring-sky-100');
-    }
-
-    // 3. 变体切换逻辑 (Simple Vanilla JS)
     document.querySelectorAll('.variant-radio').forEach(radio => {
         radio.addEventListener('change', function() {
-            // 获取当前所有选中的选项
+            updateVariantStyle(this);
             const selectedOptions = Array.from(document.querySelectorAll('.variant-radio:checked')).map(r => r.value);
-            
-            // 在 product.variants 中查找匹配的变体
             const matchedVariant = product.variants.find(variant => {
                 return variant.options.every((val, index) => val === selectedOptions[index]);
             });
 
             if (matchedVariant) {
-                // 更新 URL (不刷新)
                 const newUrl = new URL(window.location);
                 newUrl.searchParams.set('variant', matchedVariant.id);
                 window.history.replaceState({}, '', newUrl);
 
-                // 更新隐藏的 ID 输入框
-                document.getElementById('VariantIdInput').value = matchedVariant.id;
+                const variantInput = document.getElementById('VariantIdInput');
+                if(variantInput) variantInput.value = matchedVariant.id;
 
-                // 更新价格
-                document.getElementById('ProductPrice').innerText = Shopify.formatMoney(matchedVariant.price);
+                const priceEl = document.getElementById('ProductPrice');
+                if(priceEl) priceEl.innerHTML = window.Shopify.formatMoney(matchedVariant.price, window.Shopify.money_format);
                 
-                // 更新图片 (如果变体有特定图片)
-                if (matchedVariant.featured_image) {
-                    changeImage(matchedVariant.featured_image.src, matchedVariant.featured_image.src, document.querySelector('.product-gallery .grid div')); // 简单回退到第一张
+                const skuEl = document.getElementById('SkuDisplay');
+                if(skuEl) skuEl.innerText = matchedVariant.sku ? matchedVariant.sku : 'N/A';
+
+                if (matchedVariant.featured_media) {
+                    const mediaId = matchedVariant.featured_media.id;
+                    const targetThumb = document.querySelector(`.thumbnail-item[data-media-id="${mediaId}"]`);
+                    if (targetThumb) {
+                        targetThumb.click();
+                    } else {
+                        const imgSrc = matchedVariant.featured_media.preview_image.src;
+                        const highResUrl = imgSrc.replace(/(\.[^.]*)$/, '_1000x$1'); 
+                        const zoomUrl = imgSrc.replace(/(\.[^.]*)$/, '_2000x$1');
+                        changeImage(highResUrl, zoomUrl, null);
+                    }
                 }
             }
         });
     });
-    
-    // 简单的 Money Formatter (需要根据你的商店设置调整)
-    if (!window.Shopify) window.Shopify = {};
-    window.Shopify.formatMoney = function(cents) {
-        return '$' + (cents / 100).toFixed(2);
+
+    document.addEventListener('DOMContentLoaded', initVariantState);
+    initVariantState();
+
+    function handleZoom(e) {
+        if (window.matchMedia("(hover: none)").matches) return;
+        const container = e.currentTarget;
+        const lens = container.querySelector('#ZoomLens');
+        if (!lens) return;
+        const rect = container.getBoundingClientRect();
+        let x = ((e.clientX - rect.left) / rect.width) * 100;
+        let y = ((e.clientY - rect.top) / rect.height) * 100;
+        x = Math.max(0, Math.min(100, x));
+        y = Math.max(0, Math.min(100, y));
+        lens.style.backgroundPosition = `${x}% ${y}%`;
     }
+    function resetZoom(e) {}
+    function changeImage(src, zoomSrc, thumbEl) {
+        const mainImg = document.getElementById('MainImage');
+        const zoomLens = document.getElementById('ZoomLens');
+        if(mainImg) mainImg.src = src;
+        if(zoomLens) zoomLens.style.backgroundImage = `url('${zoomSrc}')`;
+        const allThumbs = document.querySelectorAll('.thumbnail-item');
+        allThumbs.forEach(t => {
+            t.classList.remove('ring-2', 'ring-black', 'border-transparent');
+            t.classList.add('border-gray-200');
+        });
+        if(thumbEl) {
+            thumbEl.classList.remove('border-gray-200');
+            thumbEl.classList.add('ring-2', 'ring-black', 'border-transparent');
+        }
+    }
+    function buyNow() {
+        const form = document.getElementById('product-form');
+        const formData = new FormData(form);
+        const buyBtn = event.currentTarget;
+        const originalText = buyBtn.innerHTML;
+        buyBtn.innerHTML = '<span>Processing...</span>';
+        buyBtn.disabled = true;
+        buyBtn.classList.add('opacity-75');
+        fetch(window.Shopify.routes.root + 'cart/add.js', { method: 'POST', body: formData })
+        .then(response => {
+            if (response.ok) window.location.href = '/checkout';
+            else throw new Error('Network response was not ok');
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            buyBtn.innerHTML = originalText;
+            buyBtn.disabled = false;
+            buyBtn.classList.remove('opacity-75');
+            alert('Failed to add to cart. Please try again.');
+        });
+    }
+
+    window.Shopify.formatMoney = function(cents, format) {
+        if (typeof cents == 'string') { cents = cents.replace('.',''); }
+        var value = '';
+        var placeholderRegex = /\{\{\s*(\w+)\s*\}\}/;
+        var formatString = format || window.Shopify.money_format || "${{amount}}";
+        function defaultOption(opt, def) { return (typeof opt == 'undefined' ? def : opt); }
+        function formatWithDelimiters(number, precision, thousands, decimal) {
+            precision = defaultOption(precision, 2);
+            thousands = defaultOption(thousands, ',');
+            decimal   = defaultOption(decimal, '.');
+            if (isNaN(number) || number == null) { return 0; }
+            number = (number/100.0).toFixed(precision);
+            var parts   = number.split('.'),
+                dollars = parts[0].replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1' + thousands),
+                cents   = parts[1] ? (decimal + parts[1]) : '';
+            return dollars + cents;
+        }
+        var match = formatString.match(placeholderRegex);
+        if (!match) return "$" + (cents/100).toFixed(2);
+        switch(match[1]) {
+            case 'amount': value = formatWithDelimiters(cents, 2); break;
+            case 'amount_no_decimals': value = formatWithDelimiters(cents, 0); break;
+            case 'amount_with_comma_separator': value = formatWithDelimiters(cents, 2, '.', ','); break;
+            case 'amount_no_decimals_with_comma_separator': value = formatWithDelimiters(cents, 0, '.', ','); break;
+        }
+        return formatString.replace(placeholderRegex, value);
+    };
 </script>
