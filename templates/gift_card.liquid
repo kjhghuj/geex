@@ -1,0 +1,120 @@
+{% layout none %}
+
+<!doctype html>
+<html lang="{{ request.locale.iso_code }}">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Gift Card - {{ shop.name }}</title>
+    <meta name="description" content="Gift card">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+
+    {{ 'base.css' | asset_url | stylesheet_tag }}
+
+    <style>
+      body { font-family: 'Inter', sans-serif; background-color: #F8FAFC; }
+      .font-display { font-family: 'Rajdhani', sans-serif; }
+    </style>
+
+    {{ content_for_header }}
+  </head>
+
+  <body class="flex items-center justify-center min-h-screen p-4">
+    <div class="max-w-md w-full bg-white p-8 rounded-[2rem] shadow-2xl text-center border border-gray-100">
+      <div class="mb-8">
+        <h1 class="text-3xl font-display font-bold text-slate-900 flex items-center justify-center gap-2">
+           <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+           {{ shop.name }}
+        </h1>
+      </div>
+
+      <h2 class="text-xl font-medium text-gray-500 mb-6">Here's your gift card!</h2>
+
+      <div class="text-5xl font-bold text-slate-900 mb-2 tracking-tight">
+        {{ gift_card.balance | money_without_trailing_zeros }}
+      </div>
+      <div class="text-sm text-gray-400 mb-8 uppercase tracking-widest font-bold">
+        {{ gift_card.currency }}
+      </div>
+
+    <div 
+        class="bg-gray-50 border-2 border-dashed border-gray-200 p-5 rounded-2xl mb-6 relative group cursor-pointer hover:border-sky-200 hover:bg-sky-50 transition-colors"
+        onclick="copyToClipboard()"
+      >
+        <input 
+          type="text" 
+          id="GiftCardCode"
+          value="{{ gift_card.code | format_code }}" 
+          readonly 
+          class="w-full text-center bg-transparent font-mono text-xl font-bold tracking-widest text-slate-900 focus:outline-none cursor-pointer selection:bg-sky-100"
+        >
+        <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-white px-2 text-xs font-bold text-gray-400 uppercase tracking-wider group-hover:text-sky-500 transition-colors">
+            Tap to Copy
+        </div>
+      </div>
+
+      <p class="text-sm text-gray-500 mb-8 leading-relaxed">
+        Use this code at checkout to redeem your gift card balance.
+      </p>
+
+      <div id="QrCode" class="flex justify-center mb-8 opacity-90" data-identifier="{{ gift_card.qr_identifier }}"></div>
+
+      </div>
+
+    <div 
+        id="ToastNotification" 
+        class="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-slate-900 text-white px-6 py-3 rounded-full shadow-2xl transition-all duration-500 ease-out opacity-0 translate-y-4 invisible pointer-events-none"
+    >
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+        <span class="font-medium text-sm">Code Copied!</span>
+    </div>
+
+    <script src="{{ 'vendor/qrcode.js' | shopify_asset_url }}" defer></script>
+    
+    <script>
+      function copyToClipboard() {
+        // 1. 获取输入框
+        var copyText = document.getElementById("GiftCardCode");
+        
+        // 2. 选中文字 (视觉反馈)
+        copyText.select();
+        copyText.setSelectionRange(0, 99999); // 兼容移动端
+
+        // 3. 执行复制
+        navigator.clipboard.writeText(copyText.value).then(function() {
+            // 4. 复制成功后，显示弹窗
+            showToast();
+        }, function(err) {
+            console.error('Could not copy text: ', err);
+        });
+      }
+
+      function showToast() {
+        var toast = document.getElementById("ToastNotification");
+        
+        // 显示：移除隐藏类，添加显示类
+        toast.classList.remove('opacity-0', 'translate-y-4', 'invisible');
+        toast.classList.add('opacity-100', 'translate-y-0');
+
+        // 2秒后自动消失
+        setTimeout(function(){
+            toast.classList.remove('opacity-100', 'translate-y-0');
+            toast.classList.add('opacity-0', 'translate-y-4', 'invisible');
+        }, 2000);
+      }
+
+      // 二维码逻辑保持不变
+      document.addEventListener('DOMContentLoaded', function() {
+        new QRCode(document.getElementById('QrCode'), {
+          text: "{{ gift_card.qr_identifier }}",
+          width: 120,
+          height: 120
+        });
+      });
+    </script>
+  </body>
+</html>

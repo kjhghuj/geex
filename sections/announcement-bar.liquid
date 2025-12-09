@@ -1,0 +1,124 @@
+{% schema %}
+{
+  "name": "Announcement Bar",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_announcement",
+      "label": "Show Announcement",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#0f172a"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "text",
+      "id": "text_primary",
+      "label": "Primary Text",
+      "default": "Summer Sale Live • Use Code [GEEX2024]"
+    },
+    {
+      "type": "text",
+      "id": "text_secondary",
+      "label": "Secondary Text",
+      "default": "Free Shipping on Orders $500+"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Announcement Bar"
+    }
+  ]
+}
+{% endschema %}
+
+{% if section.settings.show_announcement %}
+<div 
+  id="AnnouncementBar"
+  class="relative overflow-hidden py-3 border-b border-slate-800 sticky top-0 z-[60]"
+  style="background-color: {{ section.settings.bg_color }}; color: {{ section.settings.text_color }};"
+>
+  <div 
+    id="AnnouncementContent" 
+    class="flex items-center gap-16 whitespace-nowrap opacity-0 transition-opacity duration-500"
+  >
+    <div class="content-unit flex items-center gap-16 text-xs font-medium tracking-widest uppercase">
+      <span class="text-sky-400 font-bold">{{ section.settings.text_primary }}</span>
+      <span>{{ section.settings.text_secondary }}</span>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* 定义跑马灯动画：从 0% 移动到 -50% */
+  /* 为什么是 -50%？因为 JS 会把内容复制一份，变成 [内容A][内容A]，移动 50% 正好是移动完第一个[内容A]的宽度，实现无缝衔接 */
+  @keyframes marquee-scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  .animate-scroll {
+    /* 动画时长根据内容长度动态调整会更自然，这里先设个固定值或由 JS 控制 */
+    animation: marquee-scroll 20s linear infinite;
+    /* 鼠标悬停时暂停 */
+    animation-play-state: running;
+  }
+  
+  /* 可选：鼠标悬停暂停 */
+  .animate-scroll:hover {
+    animation-play-state: paused;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const container = document.getElementById('AnnouncementBar');
+    const wrapper = document.getElementById('AnnouncementContent');
+    const contentUnit = wrapper.querySelector('.content-unit');
+
+    if (!container || !wrapper || !contentUnit) return;
+
+    // 1. 获取宽度
+    const containerWidth = container.offsetWidth;
+    const contentWidth = contentUnit.offsetWidth;
+    // gap-16 对应 4rem (64px)，手动加上间距以确保计算精确
+    const gap = 64; 
+    const totalContentWidth = contentWidth + gap;
+
+    // 2. 判断逻辑
+    if (totalContentWidth > containerWidth) {
+      // === 情况 A：文字太长，需要滚动 ===
+      
+      // 复制一份内容，追加到后面，形成 [内容] [内容] 结构
+      // 这样当第一个 [内容] 滚出屏幕时，第二个 [内容] 正好接上
+      const clone = contentUnit.cloneNode(true);
+      wrapper.appendChild(clone);
+      
+      // 添加动画类
+      wrapper.classList.add('animate-scroll');
+      
+      // 动态计算速度：每秒移动 50px，保证不同长度文字速度一致
+      const duration = (totalContentWidth * 2) / 50; 
+      wrapper.style.animationDuration = `${duration}s`;
+      
+    } else {
+      // === 情况 B：文字短，不需要滚动 ===
+      
+      // 让外层容器居中
+      wrapper.classList.add('justify-center', 'w-full');
+    }
+
+    // 3. 计算完毕，显示内容
+    wrapper.classList.remove('opacity-0');
+  });
+</script>
+{% endif %}

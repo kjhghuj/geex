@@ -1,0 +1,42 @@
+{% schema %}
+{
+  "name": "About Page",
+  "settings": [],
+  "presets": [
+    {
+      "name": "About Page Content"
+    }
+  ]
+}
+{% endschema %}
+
+<div class="max-w-4xl mx-auto px-4 py-24 text-center animate-fade-in">
+    <div class="w-24 h-24 bg-sky-50 rounded-full mx-auto mb-8 flex items-center justify-center text-sky-500">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/><path d="M15 2v2"/><path d="M15 20v2"/><path d="M2 15h2"/><path d="M2 9h2"/><path d="M20 15h2"/><path d="M20 9h2"/><path d="M9 2v2"/><path d="M9 20v2"/></svg>
+    </div>
+    
+    <h1 class="text-5xl font-bold text-slate-900 mb-8">{{ page.title }}</h1>
+    
+    <div class="text-xl text-gray-500 font-light leading-relaxed mb-16">
+        {% if page.content != blank %}
+            {{ page.content }}
+        {% else %}
+            GEEX Industries was founded in 2022 with a singular mission: to bridge the gap between biological intent and digital execution. We engineer high-performance peripherals that serve as seamless extensions of the human nervous system.
+        {% endif %}
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="p-8 bg-white rounded-3xl border border-gray-100 shadow-sm">
+            <h3 class="font-bold text-sky-500 text-4xl mb-2">50+</h3>
+            <p class="text-gray-400 text-sm font-medium uppercase tracking-wide">Patents Filed</p>
+        </div>
+        <div class="p-8 bg-white rounded-3xl border border-gray-100 shadow-sm">
+            <h3 class="font-bold text-sky-500 text-4xl mb-2">2M+</h3>
+            <p class="text-gray-400 text-sm font-medium uppercase tracking-wide">Units Shipped</p>
+        </div>
+        <div class="p-8 bg-white rounded-3xl border border-gray-100 shadow-sm">
+            <h3 class="font-bold text-sky-500 text-4xl mb-2">99%</h3>
+            <p class="text-gray-400 text-sm font-medium uppercase tracking-wide">Satisfaction</p>
+        </div>
+    </div>
+</div>

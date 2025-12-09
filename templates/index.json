@@ -1,0 +1,114 @@
+{
+  "sections": {
+    "hero": {
+      "type": "hero-banner",
+      "settings": {
+        "bg_image": "shopify:\/\/shop_images\/hero-bg.jpg",
+        "badge_text": "Season 4 Collection",
+        "title_part_1": "Elevate Your",
+        "title_part_2": "Workspace",
+        "description": "Premium peripherals designed for elegance, comfort, and uncompromising performance.",
+        "button_label": "Shop Collection",
+        "button_link": "shopify:\/\/collections\/all"
+      }
+    },
+    "stats": {
+      "type": "promo-stats",
+      "settings": {
+        "offer_text": "Limited Time Offer",
+        "coupon_code": "GEEX2024",
+        "discount_value": "20%"
+      }
+    },
+    "cat_list": {
+      "type": "collection-list",
+      "blocks": {
+        "cat_1": {
+          "type": "collection_item",
+          "settings": {
+            "collection": "keyboards",
+            "custom_title": "Keyboard",
+            "svg_icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect width=\"20\" height=\"16\" x=\"2\" y=\"4\" rx=\"2\" ry=\"2\"/><path d=\"M6 8h.001\"/><path d=\"M10 8h.001\"/><path d=\"M14 8h.001\"/><path d=\"M18 8h.001\"/><path d=\"M6 12h.001\"/><path d=\"M10 12h.001\"/><path d=\"M14 12h.001\"/><path d=\"M18 12h.001\"/><path d=\"M7 16h10\"/></svg>"
+          }
+        },
+        "cat_2": {
+          "type": "collection_item",
+          "settings": {
+            "collection": "mice",
+            "custom_title": "Mouse",
+            "svg_icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"5\" y=\"2\" width=\"14\" height=\"20\" rx=\"7\" ry=\"7\"/><path d=\"M12 6v4\"/></svg>"
+          }
+        },
+        "cat_3": {
+          "type": "collection_item",
+          "settings": {
+            "collection": "media",
+            "custom_title": "Media",
+            "svg_icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3 14v-3a9 9 0 0 1 18 0v3\"/><path d=\"M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z\"/></svg>"
+          }
+        },
+        "cat_4": {
+          "type": "collection_item",
+          "settings": {
+            "collection": "monitors",
+            "custom_title": "Monitor",
+            "svg_icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"2\" y=\"3\" width=\"20\" height=\"14\" rx=\"2\" ry=\"2\"/><line x1=\"8\" y1=\"21\" x2=\"16\" y2=\"21\"/><line x1=\"12\" y1=\"17\" x2=\"12\" y2=\"21\"/></svg>"
+          }
+        },
+        "cat_5": {
+          "type": "collection_item",
+          "settings": {
+            "collection": "accessories",
+            "custom_title": "Accessories",
+            "svg_icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M17 21v-2a1 1 0 0 1-1-1v-1a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v1a1 1 0 0 1-1 1\"/><path d=\"M19 15V6.5a1 1 0 0 0-7 0v11a1 1 0 0 1-7 0V9\"/><path d=\"M21 21v-2h-4\"/><path d=\"M3 5v14a2 2 0 0 0 2 2h16\"/></svg>"
+          }
+        }
+      },
+      "block_order": [
+        "cat_1",
+        "cat_2",
+        "cat_3",
+        "cat_4",
+        "cat_5"
+      ],
+      "settings": {
+        "title": "Browse by Category",
+        "subtitle": "Find your perfect setup"
+      }
+    },
+    "featured": {
+      "type": "featured-collection",
+      "settings": {
+        "title": "Featured Collection",
+        "collection": "frontpage",
+        "products_to_show": 5
+      }
+    },
+    "cta": {
+      "type": "cta-banner",
+      "settings": {
+        "subtitle": "Cyber Week Event",
+        "title": "Upgrade Your Battle Station",
+        "text": "Experience the pinnacle of gaming luxury. Exclusive discounts on our premium mechanical keyboards.",
+        "button_label": "Access Deals",
+        "button_link": "shopify:\/\/collections\/all"
+      }
+    },
+    "new_arrivals": {
+      "type": "featured-collection",
+      "settings": {
+        "title": "New Arrivals",
+        "collection": "all",
+        "products_to_show": 5
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "stats",
+    "cat_list",
+    "featured",
+    "cta",
+    "new_arrivals"
+  ]
+}

@@ -1,0 +1,248 @@
+{% schema %}
+{
+  "name": "Search Page",
+  "settings": [
+    {
+      "type": "collection",
+      "id": "featured_collection",
+      "label": "Trending Collection",
+      "info": "Shown when no search query is entered"
+    }
+  ]
+}
+{% endschema %}
+
+<div 
+  class="animate-fade-in bg-[#F8FAFC] min-h-[600px]"
+  x-data="{ 
+    query: '{{ search.terms | escape }}',
+    activeTab: 'all' 
+  }"
+>
+    <div class="bg-white border-b border-gray-100 shadow-sm sticky top-[80px] z-30 py-4 px-4">
+        <div class="max-w-4xl mx-auto">
+            <form action="{{ routes.search_url }}" method="get" role="search" class="relative group">
+                <input type="hidden" name="type" value="product,article">
+                
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-sky-500 transition-colors pointer-events-none"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                
+                <input 
+                    type="text"
+                    name="q"
+                    x-model="query"
+                    x-init="$nextTick(() => $el.focus())"
+                    placeholder="Search..."
+                    class="w-full bg-gray-50 border border-transparent focus:bg-white focus:border-sky-500 rounded-full pl-14 pr-10 py-3 text-base font-medium outline-none transition-all duration-300 shadow-inner focus:shadow-md focus:shadow-sky-50 placeholder:text-gray-400"
+                    autocomplete="off"
+                >
+                
+                {% if search.performed and search.terms != blank %}
+                    <a href="{{ routes.search_url }}" class="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-slate-900 hover:bg-gray-100 rounded-full transition-all">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                    </a>
+                {% endif %}
+            </form>
+
+            {% unless search.performed %}
+                <div class="flex flex-wrap items-center justify-center gap-2 mt-6 animate-fade-in">
+                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> 
+                        Popular:
+                    </span>
+                    {% assign popular_terms = "Wireless, Mechanical, Gaming, Monitor, Ergonomic" | split: ", " %}
+                    {% for term in popular_terms %}
+                        <a href="{{ routes.search_url }}?q={{ term }}&type=product,article" class="px-3 py-1 rounded-full bg-white border border-gray-200 text-xs text-gray-600 hover:border-sky-300 hover:text-sky-600 hover:bg-sky-50 transition-all">
+                            {{ term }}
+                        </a>
+                    {% endfor %}
+                </div>
+            {% endunless %}
+
+            {% if search.performed %}
+                {% assign product_count = search.results | where: "object_type", "product" | size %}
+                {% assign article_count = search.results | where: "object_type", "article" | size %}
+                
+                <div class="flex justify-center mt-6 gap-2 animate-fade-in" x-cloak>
+                    <button 
+                        @click="activeTab = 'all'"
+                        :class="activeTab === 'all' ? 'bg-slate-900 text-white shadow-md' : 'bg-white text-gray-500 hover:bg-gray-50 border border-gray-100'"
+                        class="px-4 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-2"
+                    >
+                        All
+                        <span :class="activeTab === 'all' ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-600'" class="px-1.5 py-0.5 rounded text-[10px]">
+                            {{ search.results_count }}
+                        </span>
+                    </button>
+
+                    <button 
+                        @click="activeTab = 'products'"
+                        :class="activeTab === 'products' ? 'bg-slate-900 text-white shadow-md' : 'bg-white text-gray-500 hover:bg-gray-50 border border-gray-100'"
+                        class="px-4 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-2"
+                    >
+                        Products
+                        <span :class="activeTab === 'products' ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-600'" class="px-1.5 py-0.5 rounded text-[10px]">
+                            {{ product_count }}
+                        </span>
+                    </button>
+
+                    <button 
+                        @click="activeTab = 'journal'"
+                        :class="activeTab === 'journal' ? 'bg-slate-900 text-white shadow-md' : 'bg-white text-gray-500 hover:bg-gray-50 border border-gray-100'"
+                        class="px-4 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-2"
+                    >
+                        Journal
+                        <span :class="activeTab === 'journal' ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-600'" class="px-1.5 py-0.5 rounded text-[10px]">
+                            {{ article_count }}
+                        </span>
+                    </button>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 py-6">
+        
+        {% unless search.performed %}
+            <div class="animate-fade-in space-y-8">
+                
+                <section>
+                    <div class="flex items-center gap-2 mb-4 text-slate-900 font-bold text-lg">
+                        <div class="p-1.5 bg-sky-100 rounded-lg text-sky-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                        </div>
+                        Discover Categories
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        {% assign cat_handles = "keyboards,mice,audio,monitors" | split: "," %}
+                        {% for handle in cat_handles %}
+                            {% assign collection = collections[handle] %}
+                            <a 
+                                href="{{ collection.url | default: routes.all_products_collection_url }}" 
+                                class="group relative h-28 rounded-2xl overflow-hidden cursor-pointer shadow-sm hover:shadow-lg transition-all block"
+                            >
+                                {% if collection.image %}
+                                    <img 
+                                        src="{{ collection.image | image_url: width: 400 }}" 
+                                        alt="{{ collection.title | escape }}"
+                                        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                                        width="400"
+                                        height="250"
+                                        loading="lazy"
+                                    >
+                                {% else %}
+                                    <div class="w-full h-full bg-slate-200 flex items-center justify-center text-slate-400">No Image</div>
+                                {% endif %}
+                                <div class="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors"></div>
+                                <div class="absolute bottom-3 left-4 text-white font-bold text-base capitalize">{{ handle }}</div>
+                            </a>
+                        {% endfor %}
+                    </div>
+                </section>
+
+                <section>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2 text-slate-900 font-bold text-lg">
+                            <div class="p-1.5 bg-pink-100 rounded-lg text-pink-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-pink-600"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                            </div>
+                            Trending Now
+                        </div>
+                    </div>
+                    
+                    {% assign trending_coll = section.settings.featured_collection %}
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                        {% for product in collections[trending_coll].products limit: 5 %}
+                            {% render 'card-product', product: product %}
+                        {% else %}
+                            <p class="text-sm text-gray-500 col-span-full">Select a collection in theme settings to show trending products.</p>
+                        {% endfor %}
+                    </div>
+                </section>
+            </div>
+        {% endunless %}
+
+        {% if search.performed %}
+            <div class="animate-fade-in pb-12">
+                {% if search.results_count == 0 %}
+                    <div class="text-center py-12 bg-white rounded-[2rem] border border-dashed border-gray-200 mt-4">
+                        <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-1">No matches found</h3>
+                        <p class="text-gray-500 mb-6 text-sm max-w-xs mx-auto">
+                            We couldn't find anything matching "{{ search.terms }}".
+                        </p>
+                        <a href="{{ routes.search_url }}" class="inline-block px-6 py-2 text-sm font-medium bg-white text-slate-700 border border-slate-200 rounded-full hover:bg-gray-50 hover:text-sky-500 transition-colors">
+                            Clear Search
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="space-y-12 mt-4">
+                        
+                        <section x-show="activeTab === 'all' || activeTab === 'products'" x-cloak>
+                            {% if product_count > 0 %}
+                                <div class="flex items-center gap-3 mb-6" x-show="activeTab === 'all'">
+                                    <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-sky-500"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22v-10"/></svg> 
+                                        Products
+                                    </h3>
+                                    <div class="h-px bg-gray-100 flex-1"></div>
+                                </div>
+                                
+                                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 md:gap-8">
+                                    {% for item in search.results %}
+                                        {% if item.object_type == 'product' %}
+                                            {% render 'card-product', product: item %}
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </section>
+
+                        <section x-show="activeTab === 'all' || activeTab === 'journal'" x-cloak>
+                            {% if article_count > 0 %}
+                                <div class="flex items-center gap-3 mb-6" x-show="activeTab === 'all'">
+                                    <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-purple-500"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg> 
+                                        Articles
+                                    </h3>
+                                    <div class="h-px bg-gray-100 flex-1"></div>
+                                </div>
+
+                                <div class="grid md:grid-cols-2 gap-4">
+                                    {% for item in search.results %}
+                                        {% if item.object_type == 'article' %}
+                                            <a href="{{ item.url }}" class="group bg-white p-3 rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:border-sky-100 transition-all cursor-pointer flex gap-4 items-center block">
+                                                <div class="w-20 h-20 rounded-xl overflow-hidden shrink-0 bg-gray-50">
+                                                    {% if item.image %}
+                                                        <img 
+                                                            src="{{ item.image | image_url: width: 200 }}" 
+                                                            alt="{{ item.title | escape }}"
+                                                            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
+                                                            width="200"
+                                                            height="200"
+                                                            loading="lazy"
+                                                        >
+                                                    {% endif %}
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="text-[10px] font-bold text-sky-500 uppercase tracking-wide mb-1">{{ item.blog.title }}</div>
+                                                    <h4 class="font-bold text-slate-900 text-base mb-1 truncate group-hover:text-sky-600 transition-colors">{{ item.title }}</h4>
+                                                    <p class="text-gray-500 text-xs line-clamp-2">{{ item.excerpt_or_content | strip_html }}</p>
+                                                </div>
+                                                <div class="p-1.5 bg-gray-50 rounded-full text-gray-400 group-hover:bg-sky-50 group-hover:text-sky-500 transition-colors">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                                                </div>
+                                            </a>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </section>
+
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>

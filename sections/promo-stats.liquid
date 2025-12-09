@@ -1,0 +1,53 @@
+{% schema %}
+{
+  "name": "Promo Stats",
+  "settings": [
+    {
+      "type": "text",
+      "id": "offer_text",
+      "label": "Offer Text",
+      "default": "Limited Time Offer"
+    },
+    {
+      "type": "text",
+      "id": "coupon_code",
+      "label": "Coupon Code",
+      "default": "GEEX2024"
+    },
+    {
+      "type": "text",
+      "id": "discount_value",
+      "label": "Discount Value",
+      "default": "20%"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Promo Stats"
+    }
+  ]
+}
+{% endschema %}
+
+<div class="max-w-6xl mx-auto px-4 -mt-12 relative z-20 mb-24">
+    <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="flex items-center gap-4">
+            <div class="bg-sky-100 p-3 rounded-full text-sky-600">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div>
+                <h3 class="font-bold text-slate-900 text-lg">{{ section.settings.offer_text }}</h3>
+                <p class="text-gray-500 text-sm">Flash sale ends soon</p>
+            </div>
+        </div>
+        <div class="h-px w-full md:w-px md:h-12 bg-gray-100"></div>
+        <div class="text-center md:text-left">
+            <p class="text-gray-500 text-sm uppercase font-bold tracking-wide">Use Code</p>
+            <p class="text-2xl font-bold text-slate-900 tracking-tight">{{ section.settings.coupon_code }}</p>
+        </div>
+        <div class="h-px w-full md:w-px md:h-12 bg-gray-100"></div>
+        <div class="flex items-center gap-2 text-3xl font-bold text-slate-900">
+            {{ section.settings.discount_value }} <span class="text-sm font-medium text-sky-500 bg-sky-50 px-2 py-1 rounded-lg">OFF</span>
+        </div>
+    </div>
+</div>

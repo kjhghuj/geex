@@ -1,0 +1,224 @@
+{% schema %}
+{
+  "name": "Product Information",
+  "settings": []
+}
+{% endschema %}
+
+{% assign selected_variant = product.selected_or_first_available_variant %}
+
+<div class="animate-fade-in max-w-7xl mx-auto px-4 py-12" id="MainProductSection" data-section-id="{{ section.id }}">
+    
+    <div class="flex items-center space-x-2 text-sm font-medium text-gray-400 mb-8 flex-wrap">
+        <a href="/" class="hover:text-sky-500 transition-colors">Home</a>
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        <a href="/collections/all" class="hover:text-sky-500 transition-colors">Shop</a>
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        <span class="text-slate-800">{{ product.title }}</span>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-16 mb-24">
+        
+        <div class="product-gallery">
+            <div 
+                class="relative aspect-square bg-white rounded-3xl overflow-hidden cursor-crosshair mb-6 group border border-gray-100 shadow-sm main-image-container"
+                onmousemove="handleZoom(event)"
+                onmouseleave="resetZoom(event)"
+            >
+                <img 
+                    id="MainImage"
+                    src="{{ main_image_url }}" 
+                    alt="{{ product.title | escape }}" 
+                    class="w-full h-full object-cover pointer-events-none"
+                    width="1000"
+                    height="1000"
+                >
+                <div 
+                    id="ZoomLens"
+                    class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                    style="background-image: url('{{ selected_variant.featured_image | default: product.featured_image | image_url: width: 2000 }}'); background-repeat: no-repeat; background-size: 200%;"
+                ></div>
+            </div>
+
+            <div class="grid grid-cols-4 gap-4">
+                {% for media in product.media %}
+                    <div 
+                        class="aspect-square rounded-2xl overflow-hidden border-2 cursor-pointer transition-all {% if forloop.first %}border-sky-500 ring-2 ring-sky-100{% else %}border-transparent hover:border-sky-200{% endif %}"
+                        onclick="changeImage('{{ media | image_url: width: 1000 }}', '{{ media | image_url: width: 2000 }}', this)"
+                    >
+                        <img 
+                            src="{{ small_thumb }}" 
+                            class="w-full h-full object-cover"
+                            width="200"
+                            height="200"
+                            alt="{{ media.alt | escape | default: product.title }}"
+                        >
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="flex flex-col justify-center">
+            <div class="inline-block bg-sky-50 text-sky-600 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide mb-4 w-fit">
+                {{ product.type }}
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold text-slate-900 mb-4 tracking-tight leading-tight">
+                {{ product.title }}
+            </h1>
+            <div class="text-3xl text-slate-900 font-bold mb-8" id="ProductPrice">
+                {{ selected_variant.price | money }}
+            </div>
+            <div class="text-gray-500 leading-relaxed mb-10 text-lg">
+                {{ product.description }}
+            </div>
+
+            {% form 'product', product %}
+                <input type="hidden" name="id" value="{{ selected_variant.id }}" id="VariantIdInput">
+
+                <div class="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm mb-8 space-y-6">
+                    
+                    {% unless product.has_only_default_variant %}
+                        {% for option in product.options_with_values %}
+                            <div>
+                                <label class="block text-sm font-bold text-slate-900 mb-3">{{ option.name }}</label>
+                                <div class="flex flex-wrap gap-3">
+                                    {% for value in option.values %}
+                                        <div class="relative">
+                                            <input 
+                                                type="radio" 
+                                                id="Option-{{ section.id }}-{{ forloop.parentloop.index0 }}-{{ forloop.index0 }}"
+                                                name="options[{{ option.name }}]"
+                                                value="{{ value | escape }}"
+                                                class="peer sr-only variant-radio"
+                                                {% if option.selected_value == value %}checked{% endif %}
+                                                data-option-index="{{ forloop.parentloop.index0 }}"
+                                            >
+                                            <label 
+                                                for="Option-{{ section.id }}-{{ forloop.parentloop.index0 }}-{{ forloop.index0 }}"
+                                                class="block px-4 py-2 rounded-xl text-sm font-medium transition-all bg-gray-50 text-gray-500 hover:bg-gray-100 peer-checked:bg-slate-900 peer-checked:text-white peer-checked:shadow-md cursor-pointer"
+                                            >
+                                                {{YZ954value }}
+                                            </label>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endunless %}
+
+                    <div>
+                        <label class="block text-sm font-bold text-slate-900 mb-3">Quantity</label>
+                        <div class="flex items-center w-36 bg-gray-50 rounded-full p-1 border border-gray-100" x-data="{ qty: 1 }">
+                            <button type="button" @click="qty = Math.max(1, qty - 1)" class="w-10 h-10 rounded-full bg-white text-slate-900 shadow-sm flex items-center justify-center hover:text-sky-500 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>
+                            </button>
+                            <input type="number" name="quantity" x-model="qty" class="w-full text-center font-bold text-slate-900 bg-transparent outline-none appearance-none m-0" min="1">
+                            <button type="button" @click="qty++" class="w-10 h-10 rounded-full bg-white text-slate-900 shadow-sm flex items-center justify-center hover:text-sky-500 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-4 mb-10">
+                    <button 
+                        type="submit" 
+                        name="add" 
+                        class="flex-1 text-lg py-4 font-medium transition-all duration-300 rounded-full bg-sky-500 text-white hover:bg-sky-400 hover:shadow-lg hover:shadow-sky-200 shadow-xl"
+                        {% unless selected_variant.available %}disabled{% endunless %}
+                    >
+                        {% if selected_variant.available %}Add to Cart{% else %}Sold Out{% endif %}
+                    </button>
+                </div>
+            {% endform %}
+
+            <div class="border-t border-gray-100 pt-8">
+                <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wide mb-6">Specifications</h3>
+                <div class="grid grid-cols-2 gap-y-4 gap-x-8">
+                    <div class="space-y-1">
+                        <div class="text-gray-400 text-xs uppercase font-bold">Vendor</div>
+                        <div class="text-slate-900 font-medium">{{ product.vendor }}</div>
+                    </div>
+                    <div class="space-y-1">
+                        <div class="text-gray-400 text-xs uppercase font-bold">SKU</div>
+                        <div class="text-slate-900 font-medium">{{ selected_variant.sku }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var product = {{ product | json }};
+</script>
+
+<script>
+    // 1. 放大镜逻辑
+    function handleZoom(e) {
+        const container = e.currentTarget;
+        const lens = container.querySelector('#ZoomLens');
+        const rect = container.getBoundingClientRect();
+        
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+        
+        lens.style.backgroundPosition = `${x}% ${y}%`;
+    }
+
+    function resetZoom(e) {
+        // CSS hover 处理了 opacity，这里可以留空或者做额外清理
+    }
+
+    // 2. 图片切换逻辑
+    function changeImage(src, zoomSrc, thumbEl) {
+        document.getElementById('MainImage').src = src;
+        document.getElementById('ZoomLens').style.backgroundImage = `url('${zoomSrc}')`;
+        
+        // 更新缩略jh边框样式
+        const thumbs = thumbEl.parentElement.children;
+        for (let t of thumbs) {
+            t.classList.remove('border-sky-500', 'ring-2', 'ring-sky-100');
+            t.classList.add('border-transparent');
+        }
+        thumbEl.classList.remove('border-transparent');
+        thumbEl.classList.add('border-sky-500', 'ring-2', 'ring-sky-100');
+    }
+
+    // 3. 变体切换逻辑 (Simple Vanilla JS)
+    document.querySelectorAll('.variant-radio').forEach(radio => {
+        radio.addEventListener('change', function() {
+            // 获取当前所有选中的选项
+            const selectedOptions = Array.from(document.querySelectorAll('.variant-radio:checked')).map(r => r.value);
+            
+            // 在 product.variants 中查找匹配的变体
+            const matchedVariant = product.variants.find(variant => {
+                return variant.options.every((val, index) => val === selectedOptions[index]);
+            });
+
+            if (matchedVariant) {
+                // 更新 URL (不刷新)
+                const newUrl = new URL(window.location);
+                newUrl.searchParams.set('variant', matchedVariant.id);
+                window.history.replaceState({}, '', newUrl);
+
+                // 更新隐藏的 ID 输入框
+                document.getElementById('VariantIdInput').value = matchedVariant.id;
+
+                // 更新价格
+                document.getElementById('ProductPrice').innerText = Shopify.formatMoney(matchedVariant.price);
+                
+                // 更新图片 (如果变体有特定图片)
+                if (matchedVariant.featured_image) {
+                    changeImage(matchedVariant.featured_image.src, matchedVariant.featured_image.src, document.querySelector('.product-gallery .grid div')); // 简单回退到第一张
+                }
+            }
+        });
+    });
+    
+    // 简单的 Money Formatter (需要根据你的商店设置调整)
+    if (!window.Shopify) window.Shopify = {};
+    window.Shopify.formatMoney = function(cents) {
+        return '$' + (cents / 100).toFixed(2);
+    }
+</script>

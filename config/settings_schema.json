@@ -1,0 +1,141 @@
+[
+  {
+    "name": "GEEX Theme",
+    "settings": [
+      {
+        "type": "header",
+        "content": "General Settings"
+      },
+      {
+        "type": "text",
+        "id": "logo_text",
+        "label": "Logo Text",
+        "default": "GEEX",
+        "info": "Enter your brand name"
+      },
+      {
+        "type": "url",
+        "id": "logo_image",
+        "label": "Logo Image",
+        "info": "Upload a custom logo image"
+      },
+      {
+        "type": "color",
+        "id": "primary_color",
+        "label": "Primary Color",
+        "default": "#0ea5e9"
+      },
+      {
+        "type": "color",
+        "id": "secondary_color",
+        "label": "Secondary Color",
+        "default": "#0f172a"
+      },
+      {
+        "type": "header",
+        "content": "Banner Settings"
+      },
+      {
+        "type": "text",
+        "id": "banner_text",
+        "label": "Banner Text",
+        "default": "Summer Sale Live • Use Code [GEEX2024] • Free Shipping on Orders $500+ • New Arrivals In Stock • Secure Checkout Guaranteed"
+      },
+      {
+        "type": "color",
+        "id": "banner_background",
+        "label": "Banner Background Color",
+        "default": "#0f172a"
+      },
+      {
+        "type": "color",
+        "id": "banner_text_color",
+        "label": "Banner Text Color",
+        "default": "#ffffff"
+      },
+      {
+        "type": "header",
+        "content": "Hero Section"
+      },
+      {
+        "type": "text",
+        "id": "hero_title",
+        "label": "Hero Title",
+        "default": "Elevate Your Workspace"
+      },
+      {
+        "type": "textarea",
+        "id": "hero_subtitle",
+        "label": "Hero Subtitle",
+        "default": "Premium peripherals designed for elegance, comfort, and uncompromising performance."
+      },
+      {
+        "type": "image_picker",
+        "id": "hero_background",
+        "label": "Hero Background Image"
+      },
+      {
+        "type": "header",
+        "content": "Product Settings"
+      },
+      {
+        "type": "range",
+        "id": "products_per_page",
+        "label": "Products per Page",
+        "min": 12,
+        "max": 48,
+        "step": 6,
+        "default": 24
+      },
+      {
+        "type": "select",
+        "id": "product_image_size",
+        "label": "Product Image Size",
+        "options": [
+          { "value": "small", "label": "Small" },
+          { "value": "medium", "label": "Medium" },
+          { "value": "large", "label": "Large" }
+        ],
+        "default": "medium"
+      },
+      {
+        "type": "header",
+        "content": "Social Media"
+      },
+      {
+        "type": "text",
+        "id": "instagram_url",
+        "label": "Instagram URL",
+        "default": "https://instagram.com"
+      },
+      {
+        "type": "text",
+        "id": "twitter_url",
+        "label": "Twitter URL",
+        "default": "https://twitter.com"
+      },
+      {
+        "type": "text",
+        "id": "facebook_url",
+        "label": "Facebook URL",
+        "default": "https://www.facebook.com/shopify"
+      },
+      {
+        "type": "header",
+        "content": "Contact Information"
+      },
+      {
+        "type": "text",
+        "id": "contact_email",
+        "label": "Contact Email",
+        "default": "support@geex.com"
+      },
+      {
+        "type": "text",
+        "id": "contact_phone",
+        "label": "Contact Phone",
+        "default": "+1 (555) 123-4567"
+      }
+    ]
+  }
+]

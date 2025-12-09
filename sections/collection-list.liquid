@@ -1,0 +1,81 @@
+{% schema %}
+{
+  "name": "Collection List",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Browse by Category"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subheading",
+      "default": "Find your perfect setup"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "collection_item",
+      "name": "Collection",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        },
+        {
+          "type": "text",
+          "id": "custom_title",
+          "label": "Custom Title (Optional)"
+        },
+        {
+          "type": "textarea",
+          "id": "svg_icon",
+          "label": "SVG Icon Code",
+          "info": "Paste SVG code here (width/height will be auto-adjusted)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection List",
+      "blocks": [
+        { "type": "collection_item" },
+        { "type": "collection_item" },
+        { "type": "collection_item" },
+        { "type": "collection_item" },
+        { "type": "collection_item" }
+      ]
+    }
+  ]
+}
+{% endschema %}
+
+<div class="max-w-7xl mx-auto px-4 py-24">
+    <div class="text-center mb-16">
+        <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-2 tracking-tight">{{ section.settings.title }}</h2>
+        <div class="w-12 h-1 bg-sky-500 mx-auto rounded-full mb-4"></div>
+        <p class="text-slate-500">{{ section.settings.subtitle }}</p>
+    </div>
+
+    <div class="flex flex-wrap justify-center gap-4 md:gap-8">
+        {% for block in section.blocks %}
+            {% assign collection = collections[block.settings.collection] %}
+            <a href="{{ collection.url | default: '#' }}" class="group bg-white border border-gray-100 w-32 h-32 md:w-40 md:h-40 rounded-3xl flex flex-col items-center justify-center gap-3 cursor-pointer hover:border-sky-200 hover:shadow-xl hover:shadow-sky-50 transition-all duration-300">
+                <div class="bg-gray-50 p-3 rounded-2xl group-hover:bg-sky-50 group-hover:text-sky-500 transition-colors text-slate-600 [&>svg]:w-7 [&>svg]:h-7">
+                    {% if block.settings.svg_icon != blank %}
+                        {{ block.settings.svg_icon }}
+                    {% else %}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                    {% endif %}
+                </div>
+                <span class="font-medium text-slate-900 text-sm">
+                    {{ block.settings.custom_title | default: collection.title | default: 'Collection' }}
+                </span>
+            </a>
+        {% endfor %}
+    </div>
+</div>

@@ -1,0 +1,175 @@
+{% schema %}
+{
+  "name": "Cart Page",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Your Bag"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subheading",
+      "default": "Review your items"
+    }
+  ]
+}
+{% endschema %}
+
+<div class="animate-fade-in max-w-7xl mx-auto px-4 py-16 min-h-screen" id="CartSection">
+    
+    <div class="text-center mb-16">
+        <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-2 tracking-tight">{{ section.settings.title }}</h2>
+        <div class="w-12 h-1 bg-sky-500 mx-auto rounded-full mb-4"></div>
+        <p class="text-slate-500">{{ section.settings.subtitle }}</p>
+    </div>
+
+    {% if cart.item_count == 0 %}
+        <div class="text-center py-24 bg-white rounded-[2.5rem] border border-dashed border-gray-200">
+            <div class="bg-gray-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-400">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+            </div>
+            <p class="text-xl font-bold text-slate-900 mb-2">Your bag is empty</p>
+            <p class="text-gray-500 mb-8">Looks like you haven't added anything yet.</p>
+            <a href="{{ routes.all_products_collection_url }}" class="inline-block px-6 py-3 font-medium transition-all duration-300 relative overflow-hidden group rounded-full active:scale-95 bg-sky-500 text-white hover:bg-sky-400 hover:shadow-lg hover:shadow-sky-200">
+                <span class="relative z-10 flex items-center justify-center gap-2">Start Shopping</span>
+            </a>
+        </div>
+    {% else %}
+        <form action="{{ routes.cart_url }}" method="post" id="cart-form" class="grid md:grid-cols-3 gap-12">
+            
+            <div class="md:col-span-2 space-y-6">
+                {% for item in cart.items %}
+                    <div class="bg-white border border-gray-100 p-4 rounded-3xl flex items-center gap-6 group hover:shadow-lg transition-all relative">
+                        <div class="w-28 h-28 bg-gray-50 flex-shrink-0 rounded-2xl overflow-hidden border border-gray-100">
+                            {% if item.image %}
+                                <img src="{{ item.image | image_url: width: 300 }}" alt="{{ item.title | escape }}" width="112" height="112" class="w-full h-full object-cover">
+                            {% endif %}
+                        </div>
+
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-lg font-bold text-slate-900 mb-1 truncate">
+                                <a href="{{ item.url }}">{{ item.product.title }}</a>
+                            </h3>
+                            <p class="text-sm text-gray-500 mb-2">{{ item.product.type }}</p>
+                            
+                            {% unless item.product.has_only_default_variant %}
+                                <div class="flex flex-wrap gap-2 mb-3">
+                                    {% for option in item.options_with_values %}
+                                        <span class="bg-gray-50 px-2 py-1 rounded-lg text-xs font-medium text-slate-700">
+                                            {{ option.value }}
+                                        </span>
+                                    {% endfor %}
+                                </div>
+                            {% endunless %}
+
+                            <div class="text-lg font-bold text-slate-900">
+                                {{ item.final_price | money }}
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col items-end gap-4">
+                            <a href="{{ item.url_to_remove }}" class="text-gray-300 hover:text-red-500 transition-colors p-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                            </a>
+
+                            <div class="flex items-center gap-3 bg-gray-50 p-1.5 rounded-full border border-gray-100">
+                                <button type="button" onclick="updateCartItem('{{ item.key }}', {{ item.quantity | minus: 1 }})" class="w-7 h-7 flex items-center justify-center rounded-full bg-white shadow-sm hover:text-sky-500 transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>
+                                </button>
+                                
+                                <span class="font-bold w-4 text-center text-sm">{{ item.quantity }}</span>
+                                
+                                <button type="button" onclick="updateCartItem('{{ item.key }}', {{ item.quantity | plus: 1 }})" class="w-7 h-7 flex items-center justify-center rounded-full bg-white shadow-sm hover:text-sky-500 transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div>
+                <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-100/50 sticky top-32">
+                    <h3 class="text-xl font-bold text-slate-900 mb-6">Order Summary</h3>
+                    
+                    <div class="space-y-4 mb-8 text-sm">
+                        <div class="flex justify-between text-gray-500">
+                            <span>Subtotal</span>
+                            <span class="font-medium text-slate-900">{{ cart.total_price | money }}</span>
+                        </div>
+                        
+                        {% assign shipping_threshold = 50000 %}
+                        {% assign shipping_cost = 2500 %}
+                        <div class="flex justify-between text-gray-500">
+                            <span>Shipping</span>
+                            <span class="font-medium text-slate-900">
+                                {% if cart.total_price > shipping_threshold %}
+                                    Free
+                                {% else %}
+                                    {{ shipping_cost | money }}
+                                {% endif %}
+                            </span>
+                        </div>
+                        
+                        <div class="h-px bg-gray-100 my-4"></div>
+                        
+                        <div class="flex justify-between text-xl font-bold text-slate-900">
+                            <span>Total</span>
+                            <span>
+                                {% if cart.total_price > shipping_threshold %}
+                                    {{ cart.total_price | money }}
+                                {% else %}
+                                    {{ cart.total_price | plus: shipping_cost | money }}
+                                {% endif %}
+                            </span>
+                        </div>
+                        {% if cart.total_price <= shipping_threshold %}
+                            <p class="text-xs text-gray-400 mt-1 italic">* Spend {{ shipping_threshold | minus: cart.total_price | money }} more for free shipping</p>
+                        {% endif %}
+                    </div>
+
+                    <button type="submit" name="checkout" class="w-full px-6 py-4 font-medium transition-all duration-300 rounded-full bg-sky-500 text-white hover:bg-sky-400 hover:shadow-lg hover:shadow-sky-200 shadow-xl mb-6">
+                        Checkout
+                    </button>
+                    
+                    <div class="flex items-center justify-center gap-2 text-xs text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        Secure Checkout
+                    </div>
+                </div>
+            </div>
+        </form>
+    {% endif %}
+</div>
+
+<script>
+    // 使用 Shopify AJAX API 更新购物车数量
+    function updateCartItem(key, quantity) {
+        // 显示加载状态（可选：可以在这里加一个 loading spinner）
+        
+        fetch(window.Shopify.routes.root + 'cart/change.js', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                id: key,
+                quantity: quantity
+            })
+        })
+        .then(response => {
+            return response.json();
+        })
+        .then(data => {
+            // 最简单的更新方式：直接重新加载页面以更新所有价格和逻辑
+            // 如果你想做无刷新更新，需要用 JS 重新渲染上面的 HTML
+            location.reload();
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+    }
+</script>

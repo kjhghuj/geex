@@ -1,0 +1,26 @@
+{
+  "sections": {
+    "banner": {
+      "type": "hero-banner",
+      "settings": {
+        "badge_text": "Shop",
+        "title_part_1": "Explore",
+        "title_part_2": "Catalog",
+        "description": "Browse our full range of premium peripherals.",
+        "button_label": "Home",
+        "button_link": "/"
+      }
+    },
+    "product-grid": {
+      "type": "main-collection-product-grid",
+      "settings": {
+        "products_per_page": 12,
+        "title": "All Products"
+      }
+    }
+  },
+  "order": [
+    "banner",
+    "product-grid"
+  ]
+}

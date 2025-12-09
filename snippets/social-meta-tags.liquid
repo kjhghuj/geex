@@ -1,0 +1,48 @@
+{% comment %}
+  Social Meta Tags for SEO and Social Sharing
+{% endcomment %}
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="{% if template contains 'product' %}product{% elsif template contains 'article' %}article{% else %}website{% endif %}">
+<meta property="og:site_name" content="{{ shop.name }}">
+<meta property="og:url" content="{{ canonical_url }}">
+<meta property="og:title" content="{% if template contains 'product' %}{{ product.title | strip_html }}{% elsif template contains 'article' %}{{ article.title | strip_html }}{% else %}{{ page_title }}{% endif %}">
+{% if template contains 'product' %}
+  {% if product.featured_image %}
+    <meta property="og:image" content="https:{{ product.featured_image | img_url: 'master' }}">
+    <meta property="og:image:secure_url" content="https:{{ product.featured_image | img_url: 'master' }}">
+  {% endif %}
+  <meta property="og:description" content="{{ product.description | strip_html | strip_newlines | truncate: 160 | escape }}">
+{% elsif template contains 'article' %}
+  {% if article.image %}
+    <meta property="og:image" content="https:{{ article.image | img_url: 'master' }}">
+    <meta property="og:image:secure_url" content="https:{{ article.image | img_url: 'master' }}">
+  {% endif %}
+  <meta property="og:description" content="{{ article.excerpt | strip_html | strip_newlines | truncate: 160 | escape }}">
+{% else %}
+  {% if page_description %}
+    <meta property="og:description" content="{{ page_description | escape }}">
+  {% endif %}
+{% endif %}
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{% if template contains 'product' %}{{ product.title | strip_html }}{% elsif template contains 'article' %}{{ article.title | strip_html }}{% else %}{{ page_title }}{% endif %}">
+<meta name="twitter:description" content="{% if template contains 'product' %}{{ product.description | strip_html | strip_newlines | truncate: 160 | escape }}{% elsif template contains 'article' %}{{ article.excerpt | strip_html | strip_newlines | truncate: 160 | escape }}{% else %}{{ page_description | escape }}{% endif %}">
+{% if template contains 'product' and product.featured_image %}
+  <meta name="twitter:image" content="https:{{ product.featured_image | img_url: '600x600' }}">
+{% elsif template contains 'article' and article.image %}
+  <meta name="twitter:image" content="https:{{ article.image | img_url: '600x600' }}">
+{% endif %}
+
+<!-- Microdata for additional SEO -->
+<meta name="author" content="{{ shop.name }}">
+<meta name="publisher" content="{{ shop.name }}">
+
+<!-- Additional SEO meta tags -->
+<meta name="robots" content="index, follow">
+<meta name="googlebot" content="index, follow">
+<meta name="theme-color" content="{{ settings.primary_color | default: '#0ea5e9' }}">
+
+<!-- Canonical URL -->
+<link rel="canonical" href="{{ canonical_url }}">

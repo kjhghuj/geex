@@ -1,0 +1,19 @@
+{
+  "current": {
+    "logo_text": "GEEX",
+    "primary_color": "#0ea5e9",
+    "secondary_color": "#0f172a",
+    "banner_text": "Summer Sale Live • Use Code [GEEX2024] • Free Shipping on Orders $500+ • New Arrivals In Stock • Secure Checkout Guaranteed",
+    "banner_background": "#0f172a",
+    "banner_text_color": "#ffffff",
+    "hero_title": "Elevate Your Workspace",
+    "hero_subtitle": "Premium peripherals designed for elegance, comfort, and uncompromising performance.",
+    "products_per_page": 24,
+    "product_image_size": "medium",
+    "contact_email": "support@geex.com",
+    "contact_phone": "+1 (555) 123-4567",
+    "instagram_url": "https://instagram.com/geex",
+    "twitter_url": "https://twitter.com/geex",
+    "facebook_url": "https://facebook.com/geex"
+  }
+}
