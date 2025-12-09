@@ -47,13 +47,12 @@
              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
           </a>
           
-          <a href="{{ routes.cart_url }}" class="p-2.5 rounded-full transition-colors relative text-gray-400 hover:bg-gray-50 hover:text-sky-500">
+          <a href="{{ routes.cart_url }}" class="p-2.5 rounded-full transition-colors relative text-gray-400 hover:bg-gray-50 hover:text-sky-500 group">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
-            {% if cart.item_count > 0 %}
-              <span class="absolute top-0 right-0 bg-sky-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold shadow-lg ring-2 ring-white">
+            
+            <span class="js-cart-count absolute top-0 right-0 bg-sky-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold shadow-lg ring-2 ring-white transition-transform duration-200 {% if cart.item_count == 0 %}hidden scale-0{% endif %}">
                 {{ cart.item_count }}
-              </span>
-            {% endif %}
+            </span>
           </a>
 
           {% if shop.customer_accounts_enabled %}
@@ -76,11 +75,10 @@
 
            <a href="{{ routes.cart_url }}" class="p-2 relative text-gray-500 hover:text-sky-500">
              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
-             {% if cart.item_count > 0 %}
-               <span class="absolute -top-1 -right-1 bg-sky-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
+             
+             <span class="js-cart-count absolute -top-1 -right-1 bg-sky-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold {% if cart.item_count == 0 %}hidden scale-0{% endif %}">
                  {{ cart.item_count }}
-               </span>
-             {% endif %}
+             </span>
            </a>
            
            <button @click="mobileMenuOpen = !mobileMenuOpen" class="p-2 text-gray-500 hover:text-sky-500">
@@ -111,3 +109,31 @@
     </div>
   </nav>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 监听来自 main-product.liquid 的 cart:refresh 事件
+    document.documentElement.addEventListener('cart:refresh', function() {
+        fetch('/cart.js')
+            .then(response => response.json())
+            .then(cart => {
+                // 更新所有购物车图标（桌面端和移动端）
+                const badges = document.querySelectorAll('.js-cart-count');
+                
+                badges.forEach(badge => {
+                    badge.innerText = cart.item_count;
+                    
+                    if (cart.item_count > 0) {
+                        badge.classList.remove('hidden', 'scale-0');
+                        // 加一点小动画让用户注意到变化
+                        badge.classList.add('scale-125');
+                        setTimeout(() => badge.classList.remove('scale-125'), 200);
+                    } else {
+                        badge.classList.add('hidden', 'scale-0');
+                    }
+                });
+            })
+            .catch(e => console.error('Error fetching cart:', e));
+    });
+});
+</script>
